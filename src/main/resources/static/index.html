@@ -1,0 +1,189 @@
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <script src="https://unpkg.com/vue@3.1.1"></script>
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus@1.0.2-beta.47/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://unpkg.com/element-plus@1.0.2-beta.47/lib/theme-chalk/display.css">
+    <!-- import JavaScript -->
+    <script src="https://unpkg.com/element-plus@1.0.2-beta.47/lib/index.full.js"></script>
+    <script src="https://unpkg.com/element-plus@1.0.2-beta.47/lib/umd/locale/zh-cn.js"></script>
+    <script src="https://unpkg.com/dayjs@1.10.5/locale/zh-cn.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title>AnimeRss</title>
+    <style>
+        .inline-block-display {
+          display: inline-block;
+        }
+        .margin-right-20 {
+          margin-right: 20px;
+        }
+        .margin-top-20 {
+          margin-top: 20px;
+        }
+        .margin-left-20 {
+          margin-left: 20px;
+        }
+        .position-absolute {
+          position:absolute;
+        }
+        .right-20 {
+          right:20px;
+        }
+        .width-100-percent{
+          width: 100%;
+        }
+        .displayNone {
+          display: none;
+        }
+        .float-right {
+          float: right;
+        }
+        .line-height-40 {
+          line-height: 40px;
+        }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+        <el-container>
+            <el-header>
+                <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+                    <el-menu-item index="1">动画列表</el-menu-item>
+                    <el-menu-item index="2">RSS订阅设置</el-menu-item>
+                </el-menu>
+            </el-header>
+          <div :class="{displayNone : isAnimeListHide}">
+            <el-container>
+              <el-main>
+                <el-row type="flex" justify="space-between">
+                <el-col :xs="14" :sm="14" :md="14" :lg="14" :xl="14">
+                <span class="line-height-40 hidden-xs-only">RSS订阅: </span>
+                <el-select v-model="nowSelectRssFeed" @change="selectRssFeedChanged" filterable placeholder="请选择">
+                    <el-option
+                      v-for="item in selectRssFeeds"
+                      :key="item.rssFeedId"
+                      :label="item.rssFeedName"
+                      :value="item.rssFeedId">
+                    </el-option>
+                </el-select>
+                </el-col>
+                <el-col :xs="8" :sm="8" :md="4" :lg="4" :xl="4">
+                  <el-button class="float-right"
+                    type="primary" 
+                    icon="el-icon-refresh" 
+                    :loading="rssFeedIsUpdating" 
+                    @click="updateRssFeed">更新{{ refeshButtonText }}</el-button>
+                </el-col>
+                </el-row>
+                <el-table
+                :data="animeTableData"
+                class="width-100-percent">
+                    <el-table-column type="expand">
+                        <template #default="props">
+                            <el-form label-position="left" inline class="demo-table-expand">
+                                <el-form-item label="网页链接:">
+                                  <el-link type="primary" :href="props.row.animePageUrl" target="_blank">{{ props.row.animePageUrl }}</el-link>
+                                </el-form-item>
+                                <el-form-item label="下载链接:">
+                                  <span>{{ props.row.downloadUrl }}</span>
+                                </el-form-item>
+                                <br>
+                                <el-button icon="el-icon-download" :loading="isSending2Aria" @click="send2Aira(props.row)" type="primary">使用aria2下载</el-button>
+                            </el-form>
+                        </template>
+                    </el-table-column>
+                    <el-table-column width="180" label="发布时间" prop="animePublishDate"></el-table-column>
+                    <el-table-column label="标题" prop="animeTitle"></el-table-column>
+                </el-table>
+                <div class="margin-top-20 margin-left-20">
+                    <el-pagination
+                        @size-change="handleAnimeTableSizeChange"
+                        @current-change="handleAnimeTableCurrentChange"
+                        v-model:currentPage="animePage.pageNum"
+                        :page-size="animePage.pageSize"
+                        layout="sizes, total, prev, pager, next"
+                        :page-sizes="[10, 15, 20, 25, 30]"
+                        :total="animePage.totalElements">
+                    </el-pagination>
+                </div>
+              </el-main>
+            </el-container>
+          </div>
+          <div :class="{displayNone : isRssFeedListHide}">
+            <el-container><el-main>
+            <div>
+              <el-button 
+                type="primary" 
+                icon="el-icon-plus" 
+                @click="addRssFeed('rssFeedForm')">新增RSS订阅</el-button>
+            </div>
+            <el-table
+              :data="rssFeedTableData"
+              class="width-100-percent margin-top-20">
+              <el-table-column class="hidden-sm-and-down"
+                prop="rssFeedUpdateDate"
+                label="更新时间"
+                width="180">
+              </el-table-column>
+              <el-table-column class="hidden-sm-and-down"
+                prop="rssFeedCreateDate"
+                label="添加时间"
+                width="180">
+              </el-table-column>
+              <el-table-column
+                prop="rssFeedName"
+                label="订阅名称">
+              </el-table-column>
+              <el-table-column label="操作" width="270">
+                <template #default="scope">
+                  <el-button
+                    size="mini"
+                    :loading="isOpeningRssFeedForm"
+                    @click="editRssFeed(scope.row)">编辑</el-button>
+                  <el-button
+                    size="mini"
+                    type="danger"
+                    @click="deleteRssFeed(scope.row)">删除</el-button>
+                  <el-button
+                    size="mini"
+                    type="danger"
+                    @click="clearRssFeedAnime(scope.row)">清空</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <div class="margin-top-20">
+              <el-pagination
+                  @size-change="handleRssFeedTableSizeChange"
+                  @current-change="handleRssFeedTableCurrentChange"
+                  v-model:currentPage="rssFeedPage.pageNum"
+                  :page-size="rssFeedPage.pageSize"
+                  layout="sizes, total, prev, pager, next"
+                  :page-sizes="[10, 15, 20, 25, 30]"
+                  :total="rssFeedPage.totalElements">
+              </el-pagination>
+            </div>
+            <el-dialog title="RSS订阅" v-model="rssFeedFormVisible">
+              <el-form :model="rssFeedForm" :rules="rssFeedFormRules" ref="rssFeedForm">
+                <el-form-item label="订阅名称：" :label-width="rssFeedFormLabelWidth" prop="rssFeedName">
+                  <el-input v-model="rssFeedForm.rssFeedName" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="订阅地址：" :label-width="rssFeedFormLabelWidth" prop="rssFeedUrl">
+                  <el-input v-model="rssFeedForm.rssFeedUrl" autocomplete="off"></el-input>
+                </el-form-item>
+              </el-form>
+              <template #footer>
+                <span class="dialog-footer">
+                  <el-button @click="cancelRssFeedForm('rssFeedForm')">取消</el-button>
+                  <el-button type="primary" :loading="rssFeedIsSubmiting" @click="submitRssFeedForm('rssFeedForm')">确定</el-button>
+                </span>
+              </template>
+            </el-dialog>
+          </el-main></el-container>
+          </div>
+          </el-container>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>
