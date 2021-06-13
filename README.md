@@ -46,9 +46,17 @@ docker run -p 8080:8080 \
 --name animerss --restart=always -d jgduhao/animerss:0.1
 ```
 
-其中配置文件目录可以不建立，不挂载，默认aria rpc地址为http://127.0.0.1:6800，无代理。
+其中配置文件目录可以不建立，不挂载，默认aria rpc地址为127.0.0.1:6800，无代理。
 
-日志目录可以不建立，不在docker run命令手动挂载，让docker自动挂载。
+日志目录和数据库文件目录可以不建立，不在docker run命令手动挂载，让docker自动挂载。
+
+精简启动命令：
+
+```bash
+docker run -p 8080:8080 --restart=always -d jgduhao/animerss:0.1
+```
+
+推荐至少挂载配置文件，方便灵活修改配置，修改配置文件后使用docker restart命令重启生效。
 
 ### 配置文件
 
