@@ -1,8 +1,5 @@
 package jgduhao.github.io.animerss.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import jgduhao.github.io.animerss.model.Anime;
 import jgduhao.github.io.animerss.service.AnimeService;
 import jgduhao.github.io.animerss.utils.PageTransfer;
@@ -18,7 +15,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
-import java.util.HashMap;
 
 @RestController
 public class AnimeController {

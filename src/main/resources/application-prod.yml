@@ -1,0 +1,32 @@
+#服务端口
+server:
+  port: 8080
+
+spring:
+  datasource:
+    #H2数据库文件位置
+    url: jdbc:h2:file:/animerss/db/animerssdb
+    username: animerss
+    password: animerss
+    driverClassName: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+logging:
+  file:
+    #日志文件位置
+    path: /animerss/log
+
+animerss:
+  #网络代理地址和端口
+  proxy:
+    host: ${ANIMERSS_PROXY_HOST:#{null}}
+    port: ${ANIERSS_PROXY_PORT:#{null}}
+    auth:
+      user: ${ANIMERSS_PROXY_AUTH_USER:#{null}}
+      secret: ${ANIMERSS_PROXY_AUTH_SECRET:#{null}}
+  #aria2rpc地址和密钥
+  aria2:
+    rpcurl: ${ANIMERSS_ARIA2_RPCURL:http://127.0.0.1:6800/}
+    secret: ${ANIMERSS_ARIA2_SECRET:#{null}}

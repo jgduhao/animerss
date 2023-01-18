@@ -4,7 +4,6 @@ import jgduhao.github.io.animerss.enums.Consts;
 import jgduhao.github.io.animerss.enums.ErrorMsg;
 import jgduhao.github.io.animerss.exception.SelfException;
 import jgduhao.github.io.animerss.model.RssFeed;
-import jgduhao.github.io.animerss.service.CategoryService;
 import jgduhao.github.io.animerss.service.RssFeedService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -15,8 +14,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

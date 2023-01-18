@@ -68,9 +68,32 @@ animerss:
   proxy:
     host: 127.0.0.1
     port: 7890
+    #网络代理认证的用户名密码信息，如果不需要认证请留空
+    auth:
+      user: abc
+      secret: abcdefg
   #aria2rpc地址和密钥,aria2 rpcurl必须配置正确否则不能下载，如果使用ariaNg之类的图形界面可以直接把图形界面上的配置拿过来,如果没有配置密钥请把secret字段留空
   aria2:
     rpcurl: http://127.0.0.1:6800/
     secret: abcdefg
 ```
+
+### 环境变量配置
+
+可以通过环境变量来配置上述配置文件中的配置项：
+
+ANIMERSS_PROXY_HOST 网络代理地址
+
+ANIERSS_PROXY_PORT 网络代理端口
+
+ANIMERSS_PROXY_AUTH_USER 网络代理认证用户名
+
+ANIMERSS_PROXY_AUTH_SECRET 网络代理认证密码
+
+ANIMERSS_ARIA2_RPCURL aria2rpc地址
+
+ANIMERSS_ARIA2_SECRET aria2rpc密钥
+
+在启动docker时也可以通过指定相应的环境变量来完成配置，而不需要额外的准备并挂载配置文件
+
 

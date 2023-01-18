@@ -39,6 +39,11 @@ public class CoreServiceImpl implements CoreService {
     @Value("${animerss.proxy.port}")
     private String proxyPort;
 
+    @Value("${animerss.proxy.auth.user}")
+    private String proxyAuthUser;
+    @Value("${animerss.proxy.auth.secret}")
+    private String proxyAuthSecret;
+
     @Value("${animerss.aria2.secret}")
     private String aria2secret;
     @Value("${animerss.aria2.rpcurl}")
@@ -174,6 +179,18 @@ public class CoreServiceImpl implements CoreService {
         HttpURLConnection httpConn;
         try {
             if(proxyHost != null && !"".equals(proxyHost) && proxyPort != null && !"".equals(proxyPort)){
+                if(proxyAuthUser != null && !"".equals(proxyAuthUser)
+                        && proxyAuthSecret != null && !"".equals(proxyAuthSecret)){
+                    System.setProperty("http.proxyUser", proxyAuthUser);
+                    System.setProperty("http.proxyPassword", proxyAuthSecret);
+                    System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
+                    Authenticator.setDefault(new Authenticator() {
+                        @Override
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(proxyAuthUser, proxyAuthSecret.toCharArray());
+                        }
+                    });
+                }
                 Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, Integer.parseInt(proxyPort)));
                 httpConn = (HttpURLConnection) url.openConnection(proxy);
             } else {
