@@ -1,0 +1,10 @@
+animerss:
+  proxy:
+    host: ${ANIMERSS_PROXY_HOST:#{null}}
+    port: ${ANIERSS_PROXY_PORT:#{null}}
+    auth:
+      user: ${ANIMERSS_PROXY_AUTH_USER:#{null}}
+      secret: ${ANIMERSS_PROXY_AUTH_SECRET:#{null}}
+  aria2:
+    rpcurl: ${ANIMERSS_ARIA2_RPCURL:http://172.17.0.1:6800/}
+    secret: ${ANIMERSS_ARIA2_SECRET:#{null}}

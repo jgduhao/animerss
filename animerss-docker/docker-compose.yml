@@ -1,0 +1,18 @@
+version: '3'
+services:
+  animerss:
+    image: "jgduhao/animerss:latest"
+    ports:
+      - "8082:8080"
+    volumes:
+      - "animerss-data:/animerss/db"
+    restart: always
+    environment: 
+      ANIMERSS_PROXY_HOST: 192.168.8.1
+      ANIMERSS_PROXY_PORT: 7890
+      ANIMERSS_PROXY_AUTH_USER: username
+      ANIMERSS_PROXY_AUTH_SECRET: passowrd
+      ANIMERSS_ARIA2_RPCURL: http://192.168.8.2:6800
+      ANIMERSS_ARIA2_SECRET: abcdefg
+volumes:
+  animerss-data: {}
