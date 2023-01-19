@@ -22,7 +22,7 @@ animerss:
   #网络代理地址和端口
   proxy:
     host: ${ANIMERSS_PROXY_HOST:#{null}}
-    port: ${ANIERSS_PROXY_PORT:#{null}}
+    port: ${ANIMERSS_PROXY_PORT:#{null}}
     auth:
       user: ${ANIMERSS_PROXY_AUTH_USER:#{null}}
       secret: ${ANIMERSS_PROXY_AUTH_SECRET:#{null}}

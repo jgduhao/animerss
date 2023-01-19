@@ -84,7 +84,7 @@ animerss:
 
 ANIMERSS_PROXY_HOST 网络代理地址
 
-ANIERSS_PROXY_PORT 网络代理端口
+ANIMERSS_PROXY_PORT 网络代理端口
 
 ANIMERSS_PROXY_AUTH_USER 网络代理认证用户名
 
