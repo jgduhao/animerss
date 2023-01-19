@@ -15,12 +15,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Transactional
@@ -36,6 +40,9 @@ public class RssFeedServiceImpl implements RssFeedService {
 
     @Autowired
     private AnimeDao animeDao;
+
+    @Autowired
+    private ThreadPoolTaskExecutor poolTaskExecutor;
 
     @Override
     public List<RssFeed> getAllRssFeedList() {
@@ -106,5 +113,35 @@ public class RssFeedServiceImpl implements RssFeedService {
             }
         }
         return newCount;
+    }
+
+    @Override
+    public int refreshAllRssFeedWithMultiThread(){
+        List<RssFeed> rssFeeds = getAllRssFeedList();
+        AtomicInteger newCount = new AtomicInteger();
+        if(rssFeeds != null && rssFeeds.size() > 0){
+            final CountDownLatch countDownLatch = new CountDownLatch(rssFeeds.size());
+            for(RssFeed rssFeed : rssFeeds){
+                poolTaskExecutor.execute(() -> {
+                    String threadName = Thread.currentThread().getName();
+                    log.info(threadName + " 正在更新： " + rssFeed.getRssFeedName());
+                    try {
+                        int resultCount = refreshRssFeed(rssFeed.getRssFeedId());
+                        newCount.getAndAdd(resultCount);
+                    } catch (Exception e){
+                        log.info(rssFeed.getRssFeedName() + "更新失败");
+                        log.error(e.getMessage(), e);
+                    }
+                    countDownLatch.countDown();
+                });
+            }
+            try {
+                countDownLatch.await(120, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                log.info(e.getMessage(), e);
+            }
+        }
+        log.info("更新完成，共更新" + newCount.get() +"条记录");
+        return newCount.get();
     }
 }

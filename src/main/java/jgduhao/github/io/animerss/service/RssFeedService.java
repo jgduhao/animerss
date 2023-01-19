@@ -24,4 +24,5 @@ public interface RssFeedService {
 
     void deleteRssFeedAnimeById(long rssFeedId);
 
+    int refreshAllRssFeedWithMultiThread();
 }

@@ -86,7 +86,7 @@ public class RssFeedController {
 
     @PatchMapping("/anime")
     public ResponseEntity<CountVo> refreshRssFeed(){
-        int newCount = rssFeedService.refreshAllRssFeed();
+        int newCount = rssFeedService.refreshAllRssFeedWithMultiThread();
         return ResponseEntity.created(URI.create("/anime"))
                 .body(new CountVo(newCount));
     }
